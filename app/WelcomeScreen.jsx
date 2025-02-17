@@ -5,55 +5,64 @@ import {
   View,
   Image,
   TouchableOpacity,
+  ImageBackground,
   useWindowDimensions,
 } from 'react-native';
-import { colors } from '../utils/colors';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+
+const colors = {
+  primary: '#1E88E5', // Vibrant blue
+  secondary: '#1565C0', // Deeper blue for contrast
+  background: '#F5F5F5', // Light gray background
+  white: '#FFFFFF',
+  black: '#212121',
+  gray: '#757575',
+};
 
 const WelcomeScreen = () => {
   const { width, height } = useWindowDimensions();
-  const imageWidth = width - 40; // Account for horizontal padding (20px each side)
-  const baseImageHeight = imageWidth * 1.2;
-  // For bigger phones, make the image even larger:
-  const imageHeight = height >= 800 ? baseImageHeight * 1.2 : baseImageHeight;
 
   return (
+    <SafeAreaProvider edges={['left', 'right', 'bottom', 'top']}>
     <View style={styles.container}>
-      {/* Header Section: Logo & Brand Name */}
-      <View style={styles.header}>
-        <Image
-          source={require('../assets/logo.png')}
-          style={styles.logo}
-        />
-        <Text style={styles.brandName}>UVicLF</Text>
-      </View>
+      <StatusBar style="light" hidden />
 
-      {/* Big Image */}
-      <Image
-        source={{ uri: 'https://picsum.photos/400/500' }}
-        style={[styles.bigImage, { width: imageWidth, height: imageHeight }]}
-        resizeMode="cover"
-      />
-
-      {/* Middle Section: Centered Text */}
-      <View style={styles.middleSection}>
-        <View style={styles.textContainer}>
-          <Text style={styles.appTitle}>Welcome to UVicLF</Text>
-          <Text style={styles.description}>
-            {`Lost something on UVic campus?\nWe can help you find it!`}
-          </Text>
-        </View>
-      </View>
-
-      {/* Footer Section: Get Started Button */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          // Handle navigation or action here
-        }}
+      <ImageBackground
+        source={{ uri: 'https://picsum.photos/800/1200' }}
+        style={styles.backgroundImage}
       >
-        <Text style={styles.buttonText}>Get Started</Text>
-      </TouchableOpacity>
+        <View style={styles.overlay}>
+          {/* Header: Logo & Brand Name */}
+          <View style={styles.header}>
+            <Image
+              source={{ uri: 'https://picsum.photos/100/100?random' }}
+              style={styles.logo}
+            />
+            <Text style={styles.brandName}>UVicLF</Text>
+          </View>
+
+          {/* Hero Section */}
+          <View style={styles.heroContent}>
+            <Text style={styles.heroTitle}>Find it. Claim it. Keep it.</Text>
+            <Text style={styles.heroSubtitle}>
+              Lost something on campus? We’ll help you get it back!
+            </Text>
+          </View>
+
+          {/* Call-to-action Button */}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              // Handle navigation
+            }}
+          >
+            <Text style={styles.buttonText}>Get Started</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
     </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -62,61 +71,56 @@ export default WelcomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 30,
+    justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: '1%', // Increased bottom margin to separate header and image
   },
   logo: {
-    width: 70,
-    height: 70,
+    width: 50,
+    height: 50,
     borderRadius: 25,
     marginRight: 10,
   },
   brandName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: colors.white,
   },
-  bigImage: {
-    borderRadius: 10,
-    marginTop: 20, // Added top margin to create space from the header
-    marginBottom: 10,
-  },
-  middleSection: {
-    flex: 1,
-    justifyContent: 'center', // Vertically center the text
-    alignItems: 'center',     // Horizontally center the text
-  },
-  textContainer: {
+  heroContent: {
     alignItems: 'center',
-    paddingHorizontal: 10,
+    justifyContent: 'center',
   },
-  appTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.black,
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: colors.gray,
+  heroTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: colors.white,
     textAlign: 'center',
+    marginBottom: 8,
+  },
+  heroSubtitle: {
+    fontSize: 18,
+    color: colors.white,
+    textAlign: 'center',
+    lineHeight: 26,
   },
   button: {
     backgroundColor: colors.primary,
-    paddingVertical: 15,
-    width: '100%',
-    alignItems: 'center',
+    paddingVertical: 14,
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    alignItems: 'center',
     elevation: 5,
   },
   buttonText: {
