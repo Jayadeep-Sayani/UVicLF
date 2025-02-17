@@ -1,8 +1,21 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
 import { colors } from '../utils/colors';
 
 const WelcomeScreen = () => {
+  const { width, height } = useWindowDimensions();
+  const imageWidth = width - 40; // Account for horizontal padding (20px each side)
+  const baseImageHeight = imageWidth * 1.2;
+  // For bigger phones, make the image even larger:
+  const imageHeight = height >= 800 ? baseImageHeight * 1.2 : baseImageHeight;
+
   return (
     <View style={styles.container}>
       {/* Header Section: Logo & Brand Name */}
@@ -14,26 +27,30 @@ const WelcomeScreen = () => {
         <Text style={styles.brandName}>UVicLF</Text>
       </View>
 
-      {/* Main Content Section: Big Image + Title & Description */}
-      <View style={styles.mainContent}>
-        <Image
-          source={{ uri: 'https://picsum.photos/400/500' }}
-          style={styles.bigImage}
-          resizeMode="cover"
-        />
+      {/* Big Image */}
+      <Image
+        source={{ uri: 'https://picsum.photos/400/500' }}
+        style={[styles.bigImage, { width: imageWidth, height: imageHeight }]}
+        resizeMode="cover"
+      />
+
+      {/* Middle Section: Centered Text */}
+      <View style={styles.middleSection}>
         <View style={styles.textContainer}>
           <Text style={styles.appTitle}>Welcome to UVicLF</Text>
           <Text style={styles.description}>
-            Lost something at UVic campus?<br></br>
-            We can help you find it!
+            {`Lost something on UVic campus?\nWe can help you find it!`}
           </Text>
         </View>
       </View>
 
       {/* Footer Section: Get Started Button */}
-      <TouchableOpacity style={styles.button} onPress={() => {
-        // Handle navigation or action here
-      }}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          // Handle navigation or action here
+        }}
+      >
         <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>
     </View>
@@ -47,12 +64,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     paddingHorizontal: 20,
-    paddingVertical: 40,
-    justifyContent: 'space-between',
+    paddingVertical: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: '1%', // Increased bottom margin to separate header and image
   },
   logo: {
     width: 70,
@@ -65,14 +82,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary,
   },
-  mainContent: {
-    alignItems: 'center',
-  },
   bigImage: {
-    width: '100%',
-    height: 500,
     borderRadius: 10,
-    marginBottom: 50,
+    marginTop: 20, // Added top margin to create space from the header
+    marginBottom: 10,
+  },
+  middleSection: {
+    flex: 1,
+    justifyContent: 'center', // Vertically center the text
+    alignItems: 'center',     // Horizontally center the text
   },
   textContainer: {
     alignItems: 'center',
@@ -93,11 +111,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingVertical: 15,
     width: '100%',
-    display: 'flex',
     alignItems: 'center',
     borderRadius: 10,
-    alignSelf: 'center',
-    // Adding a subtle shadow for a modern touch
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
