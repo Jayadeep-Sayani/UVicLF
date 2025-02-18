@@ -5,20 +5,11 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ImageBackground,
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-
-const colors = {
-  primary: '#1E88E5', // Vibrant blue
-  secondary: '#1565C0', // Deeper blue for contrast
-  background: '#F5F5F5', // Light gray background
-  white: '#FFFFFF',
-  black: '#212121',
-  gray: '#757575',
-};
+import { colors } from '../utils/colors';
 
 const WelcomeScreen = () => {
   const { width, height } = useWindowDimensions();
@@ -28,15 +19,12 @@ const WelcomeScreen = () => {
     <View style={styles.container}>
       <StatusBar style="light" hidden />
 
-      <ImageBackground
-        source={{ uri: 'https://picsum.photos/800/1200' }}
-        style={styles.backgroundImage}
-      >
+      
         <View style={styles.overlay}>
           {/* Header: Logo & Brand Name */}
           <View style={styles.header}>
             <Image
-              source={{ uri: 'https://picsum.photos/100/100?random' }}
+              source={require('../assets/logo.png')}
               style={styles.logo}
             />
             <Text style={styles.brandName}>UVicLF</Text>
@@ -44,9 +32,10 @@ const WelcomeScreen = () => {
 
           {/* Hero Section */}
           <View style={styles.heroContent}>
-            <Text style={styles.heroTitle}>Find it. Claim it. Keep it.</Text>
+            <Image source={{ uri: 'https://www.uvic.ca/brand/_assets/images/cards/cards/uvic-mark.webp'}} style={{ width: '100%', aspectRatio: 1, marginBottom: '-25%'  }} resizeMode="contain"/>
+            <Text style={styles.heroTitle}>Find it. Claim it. Relax.</Text>
             <Text style={styles.heroSubtitle}>
-              Lost something on campus? We’ll help you get it back!
+              Lost something on UVic campus? We’ll help you get it back!
             </Text>
           </View>
 
@@ -60,7 +49,6 @@ const WelcomeScreen = () => {
             <Text style={styles.buttonText}>Get Started</Text>
           </TouchableOpacity>
         </View>
-      </ImageBackground>
     </View>
     </SafeAreaProvider>
   );
@@ -79,7 +67,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: colors.white,
     paddingHorizontal: 20,
     paddingVertical: 30,
     justifyContent: 'space-between',
@@ -97,7 +85,7 @@ const styles = StyleSheet.create({
   brandName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.white,
+    color: colors.primary,
   },
   heroContent: {
     alignItems: 'center',
@@ -106,15 +94,16 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: colors.white,
+    color: colors.primary,
     textAlign: 'center',
     marginBottom: 8,
   },
   heroSubtitle: {
     fontSize: 18,
-    color: colors.white,
+    color: colors.primary,
     textAlign: 'center',
     lineHeight: 26,
+    marginHorizontal: 30,
   },
   button: {
     backgroundColor: colors.primary,
