@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { colors } from '../utils/colors';
 import { useNavigation } from '@react-navigation/native';
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   const navigation = useNavigation();
 
   return (
@@ -27,10 +27,15 @@ const LoginScreen = () => {
             <Text style={styles.brandName}>UVicLF</Text>
           </View>
 
-          {/* Login Form */}
+          {/* Register Form */}
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Sign Up</Text>
 
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              placeholderTextColor={colors.gray}
+            />
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -42,16 +47,22 @@ const LoginScreen = () => {
               placeholderTextColor={colors.gray}
               secureTextEntry
             />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm Password"
+              placeholderTextColor={colors.gray}
+              secureTextEntry
+            />
 
             <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>Sign In</Text>
+              <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('REGISTER')}
+              onPress={() => navigation.navigate('LOGIN')}
               style={styles.linkContainer}
             >
-              <Text style={styles.linkText}>Don't have an account? Sign up</Text>
+              <Text style={styles.linkText}>Already have an account? Sign in</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -60,7 +71,7 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {

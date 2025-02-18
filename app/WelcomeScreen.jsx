@@ -10,9 +10,11 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { colors } from '../utils/colors';
+import { useNavigation } from '@react-navigation/native';
 
 const WelcomeScreen = () => {
   const { width, height } = useWindowDimensions();
+  const navigation = useNavigation();
 
   return (
     <SafeAreaProvider edges={['left', 'right', 'bottom', 'top']}>
@@ -43,7 +45,7 @@ const WelcomeScreen = () => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              // Handle navigation
+              navigation.navigate('LOGIN');
             }}
           >
             <Text style={styles.buttonText}>Get Started</Text>
@@ -104,6 +106,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 26,
     marginHorizontal: 30,
+    marginBottom: 100,
   },
   button: {
     backgroundColor: colors.primary,
