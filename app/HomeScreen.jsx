@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, AppState } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,14 +10,32 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
+  // Listen for app state changes
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      // When app comes to the foreground, hide the modal
+      if (nextAppState === 'active') {
+        setModalVisible(false);
+      }
+    });
+
+    // Clean up the subscription on unmount
+    return () => subscription.remove();
+  }, []);
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      navigation.navigate('Welcome');
+      // Reset the navigation stack to only have the 'WELCOME' screen.
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'WELCOME' }],
+      });
     } catch (error) {
       console.error('Error logging out:', error);
     }
   };
+  
 
   return (
     <SafeAreaProvider edges={['left', 'right', 'bottom', 'top']}>

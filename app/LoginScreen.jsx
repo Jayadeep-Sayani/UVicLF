@@ -40,8 +40,11 @@ const LoginScreen = () => {
         return;
       }
 
-      // Navigate to the home screen or another page after login
-      navigation.navigate('HOME');
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'HOME' }],
+      });
     } catch (error) {
       console.error('Error logging in:', error);
       setErrorMessage('An error occurred during login. Please try again later.');
