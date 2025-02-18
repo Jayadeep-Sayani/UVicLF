@@ -50,7 +50,6 @@ const RegisterScreen = () => {
           return;
         }
     
-        console.log('User registered:', user);
     
         // Optionally navigate to the login screen after successful sign-up
         navigation.navigate('LOGIN');

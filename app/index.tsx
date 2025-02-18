@@ -1,23 +1,36 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { supabase } from '../utils/supabaseClient';
+
 import WelcomeScreen from './WelcomeScreen';
-import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
+import LoginScreen from './LoginScreen';
+import HomeScreen from './HomeScreen';
 
 const Stack = createNativeStackNavigator();
 
-const index = () => {
+const App = () => {
+  const [initialRoute, setInitialRoute] = useState('WELCOME');
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data?.user) {
+        setInitialRoute('HOME'); // Redirect to Home if logged in
+      }
+    };
+
+    checkUser();
+  }, []);
+
   return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={WelcomeScreen} />
-        <Stack.Screen name="LOGIN" component={LoginScreen} />
-        <Stack.Screen name="REGISTER" component={RegisterScreen} />
-      </Stack.Navigator>
+    <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="WELCOME" component={WelcomeScreen} />
+      <Stack.Screen name="LOGIN" component={LoginScreen} />
+      <Stack.Screen name="REGISTER" component={RegisterScreen} />
+      <Stack.Screen name="HOME" component={HomeScreen} />
+    </Stack.Navigator>
   );
-}
+};
 
-export default index
-
-const styles = StyleSheet.create({})
+export default App;

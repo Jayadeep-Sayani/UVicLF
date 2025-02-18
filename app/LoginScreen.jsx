@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,14 +6,47 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { colors } from '../utils/colors';
 import { useNavigation } from '@react-navigation/native';
+import { supabase } from '../utils/supabaseClient';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleLogin = async () => {
+    setErrorMessage('');
+    Keyboard.dismiss();
+
+    if (!email || !password) {
+      setErrorMessage('All fields are required.');
+      return;
+    }
+
+    try {
+      const { user, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        return;
+      }
+
+      // Navigate to the home screen or another page after login
+      navigation.navigate('HOME');
+    } catch (error) {
+      console.error('Error logging in:', error);
+      setErrorMessage('An error occurred during login. Please try again later.');
+    }
+  };
 
   return (
     <SafeAreaProvider edges={['left', 'right', 'bottom', 'top']}>
@@ -21,13 +54,11 @@ const LoginScreen = () => {
         <StatusBar style="light" hidden />
 
         <View style={styles.overlay}>
-          {/* Header: Logo & Title */}
           <View style={styles.header}>
             <Image source={require('../assets/logo.png')} style={styles.logo} />
             <Text style={styles.brandName}>UVicLF</Text>
           </View>
 
-          {/* Login Form */}
           <View style={styles.formContainer}>
             <Text style={styles.title}>Login</Text>
 
@@ -35,15 +66,19 @@ const LoginScreen = () => {
               style={styles.input}
               placeholder="Email"
               placeholderTextColor={colors.gray}
+              value={email}
+              onChangeText={setEmail}
             />
             <TextInput
               style={styles.input}
               placeholder="Password"
               placeholderTextColor={colors.gray}
               secureTextEntry
+              value={password}
+              onChangeText={setPassword}
             />
-
-            <TouchableOpacity style={styles.button}>
+            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
 
@@ -100,6 +135,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 10,
   },
   input: {
     width: '100%',
