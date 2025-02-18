@@ -8,9 +8,10 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "androidStatusBar": {
-        "translucent": true,
-        "hidden": true
-      },
+      "translucent": true,
+      "hidden": true
+    },
+
   
     "newArchEnabled": true,
     "ios": {

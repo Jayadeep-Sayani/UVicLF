@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,14 +6,61 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { colors } from '../utils/colors';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';  
+import { supabase } from '../utils/supabaseClient'; 
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSignUp = async () => {
+    setErrorMessage('');
+    Keyboard.dismiss();
+
+    if (!fullName || !email || !password || !confirmPassword) {
+      setErrorMessage('All fields are required.');
+      return;
+    }
+    if (!email.endsWith('@uvic.ca')) {
+      setErrorMessage('Email must be a @uvic.ca address.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match.');
+      return;
+    }
+
+    try {
+        const { user, error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+        });
+    
+        if (error) {
+          setErrorMessage(error.message);
+          return;
+        }
+    
+        console.log('User registered:', user);
+    
+        // Optionally navigate to the login screen after successful sign-up
+        navigation.navigate('LOGIN');
+      } catch (error) {
+        console.error('Error signing up:', error);
+        setErrorMessage('An error occurred during sign-up. Please try again later.');
+      }
+
+    console.log('Hello');
+  };
 
   return (
     <SafeAreaProvider edges={['left', 'right', 'bottom', 'top']}>
@@ -21,40 +68,47 @@ const RegisterScreen = () => {
         <StatusBar style="light" hidden />
 
         <View style={styles.overlay}>
-          {/* Header: Logo & Title */}
           <View style={styles.header}>
             <Image source={require('../assets/logo.png')} style={styles.logo} />
             <Text style={styles.brandName}>UVicLF</Text>
           </View>
 
-          {/* Register Form */}
           <View style={styles.formContainer}>
             <Text style={styles.title}>Sign Up</Text>
+   
 
             <TextInput
               style={styles.input}
               placeholder="Full Name"
               placeholderTextColor={colors.gray}
+              value={fullName}
+              onChangeText={setFullName}
             />
             <TextInput
               style={styles.input}
               placeholder="Email"
               placeholderTextColor={colors.gray}
+              value={email}
+              onChangeText={setEmail}
             />
             <TextInput
               style={styles.input}
               placeholder="Password"
               placeholderTextColor={colors.gray}
               secureTextEntry
+              value={password}
+              onChangeText={setPassword}
             />
             <TextInput
               style={styles.input}
               placeholder="Confirm Password"
               placeholderTextColor={colors.gray}
               secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
             />
-
-            <TouchableOpacity style={styles.button}>
+            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+            <TouchableOpacity style={styles.button} onPress={handleSignUp}>
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
 
@@ -111,6 +165,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 10,
   },
   input: {
     width: '100%',
