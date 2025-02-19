@@ -7,6 +7,7 @@ import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import ReportScreen from './ReportScreen';
+import ExploreScreen from './ExploreScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ const App = () => {
       <Stack.Screen name="REGISTER" component={RegisterScreen} />
       <Stack.Screen name="HOME" component={HomeScreen} />
       <Stack.Screen name="REPORT" component={ReportScreen} />
+      <Stack.Screen name="EXPLORE" component={ExploreScreen} />
     </Stack.Navigator>
   );
 };

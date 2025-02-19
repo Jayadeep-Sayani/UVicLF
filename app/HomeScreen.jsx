@@ -54,7 +54,7 @@ const HomeScreen = () => {
 
     if (!result.canceled) {
       // Handle the image upload here (don't show the image)
-      navigation.navigate('REPORT', { image: result.assets.uri });
+      navigation.navigate('REPORT', { image_uri: result.assets[0].uri });
       // You can implement the image upload to Supabase here if required
     }
   };
@@ -75,7 +75,7 @@ const HomeScreen = () => {
 
     if (!result.canceled) {
       // Handle the image upload here (don't show the image)
-      navigation.navigate('REPORT', { image: result });
+      navigation.navigate('REPORT', { image_uri: result.assets[0].uri });
       // You can implement the image upload to Supabase here if required
     }
   };
