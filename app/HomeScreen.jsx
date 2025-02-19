@@ -105,19 +105,7 @@ const HomeScreen = () => {
             <Text style={styles.uploadText}>Take a picture of the item (Camera)</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Bottom Navigation */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HOME')}>
-            <Ionicons name="add-circle-outline" size={28} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('EXPLORE')}>
-            <Ionicons name="search" size={28} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem} onPress={() => setModalVisible(true)}>
-            <Ionicons name="log-out-outline" size={28} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
+        
 
         {/* Logout Confirmation Modal */}
         <Modal
@@ -150,6 +138,17 @@ const HomeScreen = () => {
           </View>
         </Modal>
       </View>
+      <View style={styles.bottomNav}>
+          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HOME')}>
+            <Ionicons name="add-circle-outline" size={28} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('EXPLORE')}>
+            <Ionicons name="search" size={28} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => setModalVisible(true)}>
+            <Ionicons name="log-out-outline" size={28} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
     </SafeAreaProvider>
   );
 };

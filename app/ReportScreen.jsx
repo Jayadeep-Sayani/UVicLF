@@ -14,13 +14,51 @@ import { supabase } from '../utils/supabaseClient';
 
 const ReportScreen = ({ navigation, route }) => {
   // Retrieve the passed image URI (or image) from navigation params
-  const { image_uri } = route.params;
-  console.log('Image URI:', image_uri);
+  const { image_uri } = route.params; 
 
   const [itemName, setItemName] = useState('');
   const [foundLocation, setFoundLocation] = useState('');
   const [retrieveLocation, setRetrieveLocation] = useState('');
   const [details, setDetails] = useState('');
+
+  // Function to upload image to Supabase Storage and return the public URL
+  const uploadImage = async (uri) => {
+    try {
+      // Convert local URI to a blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      // Create a unique filename
+      const filename = `reports/${Date.now()}.jpg`;
+
+      // Upload the image to a Supabase Storage bucket (e.g., 'lost-found-images')
+      const { data, error } = await supabase.storage
+        .from('lost-found-images')
+        .upload(filename, blob);
+
+      if (error) {
+        console.error('Error uploading image:', error.message);
+        Alert.alert('Upload Error', 'Failed to upload image.');
+        return null;
+      }
+
+      // Get the public URL for the uploaded image
+      const { data: publicData } = supabase.storage
+        .from('lost-found-images')
+        .getPublicUrl(filename);
+
+      const publicUrl = publicData.publicUrl;
+
+      console.log('Public URL:', publicUrl);
+
+      return publicUrl;
+
+    } catch (err) {
+      console.error('Upload exception:', err);
+      Alert.alert('Error', 'An error occurred while uploading the image.');
+      return null;
+    }
+  };
 
   const handleReport = async () => {
     // Validate required fields
@@ -30,14 +68,10 @@ const ReportScreen = ({ navigation, route }) => {
     }
 
     // Retrieve the current user from Supabase Auth.
-    // For Supabase JS v2 use:
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
-
-    // If you're using v1, you might use:
-    // const user = supabase.auth.user();
 
     if (userError || !user) {
       Alert.alert('Error', 'User not authenticated');
@@ -47,15 +81,26 @@ const ReportScreen = ({ navigation, route }) => {
     // Retrieve full name from user metadata (or fallback to email)
     const fullName = user.user_metadata.full_name || user.email || 'Anonymous';
 
-    // Build the report object
+    // Upload the image and get its public URL
+    let uploadedImageURL = null;
+    if (image_uri) {
+      uploadedImageURL = await uploadImage(image_uri);
+      if (!uploadedImageURL) {
+        // Stop if image upload fails
+        return;
+      }
+    }
+    console.log('Uploaded image URL:', uploadedImageURL);
+    // Build the report object using the public URL for the image
     const reportData = {
-      image_uri,
+      image_uri: uploadedImageURL, // now a remote URL
       itemName,
       foundLocation,
       retrieveLocation,
       details,
       fullName,
     };
+
 
     try {
       // Insert the report data into the 'lost_items' table in Supabase

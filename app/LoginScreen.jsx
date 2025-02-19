@@ -36,6 +36,10 @@ const LoginScreen = () => {
       });
 
       if (error) {
+        if (error.message.includes('Email not confirmed')) {
+          setErrorMessage('Please verify your email before logging in.');
+          return;
+        } 
         setErrorMessage(error.message);
         return;
       }
