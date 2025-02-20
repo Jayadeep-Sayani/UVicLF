@@ -3,12 +3,13 @@ import {
   StyleSheet,
   Text,
   View,
-  FlatList,
   Image,
   ActivityIndicator,
   Modal,
   TouchableOpacity,
   AppState,
+  RefreshControl,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -20,9 +21,9 @@ const ExploreScreen = () => {
   const navigation = useNavigation();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Hide logout modal when app comes to foreground
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'active') {
@@ -32,9 +33,9 @@ const ExploreScreen = () => {
     return () => subscription.remove();
   }, []);
 
-  // Fetch reported items from the past 7 days
   const fetchReports = async () => {
     setLoading(true);
+    setRefreshing(true);
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await supabase
@@ -49,13 +50,13 @@ const ExploreScreen = () => {
       setReports(data);
     }
     setLoading(false);
+    setRefreshing(false);
   };
 
   useEffect(() => {
     fetchReports();
   }, []);
 
-  // Logout the user and reset navigation to 'WELCOME'
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -68,45 +69,39 @@ const ExploreScreen = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      {item.image_uri ? (
-        <Image source={{ uri: item.image_uri }} style={styles.cardImage} />
-      ) : null}
-      <Text style={styles.itemName}>{item.itemName}</Text>
-      <Text style={styles.label}>
-        Found at: <Text style={styles.value}>{item.foundLocation}</Text>
-      </Text>
-      <Text style={styles.label}>
-        Retrieval Location: <Text style={styles.value}>{item.retrieveLocation}</Text>
-      </Text>
-      {item.details ? (
-        <Text style={styles.details}>Details: {item.details}</Text>
-      ) : null}
-      <Text style={styles.reportedBy}>Reported by: {item.fullName}</Text>
-    </View>
-  );
-
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <View style={styles.contentContainer}>
+      <ScrollView
+        style={styles.contentContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={fetchReports} />
+        }
+      >
         <View style={styles.headerContainer}>
           <Text style={styles.title}>Reported Items (Last 7 Days)</Text>
         </View>
+
         {loading ? (
           <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
+        ) : reports.length === 0 ? (
+          <Text style={styles.emptyText}>No reports found in the past 7 days.</Text>
         ) : (
-          <FlatList
-            data={reports}
-            keyExtractor={(item) => (item.id ? item.id.toString() : Math.random().toString())}
-            renderItem={renderItem}
-            contentContainerStyle={styles.listContainer}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>No reports found in the past 7 days.</Text>
-            }
-          />
+          reports.map((item) => (
+            <View key={item.id} style={styles.card}>
+              {item.image_uri && <Image source={{ uri: item.image_uri }} style={styles.cardImage} />}
+              <Text style={styles.itemName}>{item.itemName}</Text>
+              <Text style={styles.label}>
+                Found at: <Text style={styles.value}>{item.foundLocation}</Text>
+              </Text>
+              <Text style={styles.label}>
+                Retrieval Location: <Text style={styles.value}>{item.retrieveLocation}</Text>
+              </Text>
+              {item.details && <Text style={styles.details}>Details: {item.details}</Text>}
+              <Text style={styles.reportedBy}>Reported by: {item.fullName}</Text>
+            </View>
+          ))
         )}
-      </View>
+      </ScrollView>
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
@@ -164,18 +159,14 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: 20,
   },
   headerContainer: {
-    marginBottom: 10,
+    padding: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.primary,
-  },
-  listContainer: {
-    paddingBottom: 20,
   },
   card: {
     backgroundColor: colors.white,
@@ -183,13 +174,11 @@ const styles = StyleSheet.create({
     borderColor: colors.gray,
     borderRadius: 10,
     padding: 15,
-    marginVertical: 10,
-    // iOS shadow
+    margin: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    // Android elevation
     elevation: 3,
   },
   cardImage: {

@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../utils/colors';
 import { supabase } from '../utils/supabaseClient';
+import * as FileSystem from "expo-file-system";
 
 const ReportScreen = ({ navigation, route }) => {
   // Retrieve the passed image URI (or image) from navigation params
@@ -22,19 +23,33 @@ const ReportScreen = ({ navigation, route }) => {
   const [details, setDetails] = useState('');
 
   // Function to upload image to Supabase Storage and return the public URL
-  const uploadImage = async (uri) => {
+  const uploadImage = async (imageUri) => {
     try {
-      // Convert local URI to a blob
-      const response = await fetch(uri);
-      const blob = await response.blob();
 
-      // Create a unique filename
+      const fileInfo = await FileSystem.getInfoAsync(imageUri);
+    if (!fileInfo.exists) {
+      console.error("File does not exist");
+      return null;
+    }
+
+    const fileName = `images/${Date.now()}.jpg`;
+
+    // Read file as base64 string
+    const base64 = await FileSystem.readAsStringAsync(imageUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    const binaryData = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
+    
       const filename = `reports/${Date.now()}.jpg`;
 
       // Upload the image to a Supabase Storage bucket (e.g., 'lost-found-images')
       const { data, error } = await supabase.storage
         .from('lost-found-images')
-        .upload(filename, blob);
+        .upload(filename, binaryData, {
+          contentType: "image/jpeg",
+        });
 
       if (error) {
         console.error('Error uploading image:', error.message);
